@@ -53,6 +53,7 @@ class ProjectManager(object):
 
         """
         data = {"project_name": project_name, "storage_folder": storage_folder, "z_to_y_remap": z_to_y_remap}
+        print("Uploading Application Settings to Database")
         self.database.upload_data(data, "ApplicationSettings")
 
     def create_project_data_from_compas(self, assembly, building_plan, qr_frames_list):
