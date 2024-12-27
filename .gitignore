@@ -107,6 +107,7 @@ ENV/
 *.3dmbak
 *.rhl
 *.rui_bak
+*.obj
 
 temp/**
 !temp/PLACEHOLDER
@@ -120,3 +121,4 @@ docs/api/generated/
 conda.recipe/
 
 scripts/firebase_config.json
+
