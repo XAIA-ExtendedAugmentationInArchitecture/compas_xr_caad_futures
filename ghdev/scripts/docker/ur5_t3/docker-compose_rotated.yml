@@ -1,0 +1,93 @@
+# THEORY : docker-compose.yml is file to configure Docker
+# and we are configuring a service called moveit service
+
+version: '2'
+services:
+  moveit-service:
+    # name of the container - we gave it
+    image: gramaziokohler/ros-noetic-moveit
+    container_name: moveit-service
+    environment:
+      - ROS_HOSTNAME=moveit-service
+      - ROS_MASTER_URI=http://ros-core:11311
+      # GUI: To forward the GUI to an external X11 server (eg. XMing), uncomment the following line
+      - DISPLAY=host.docker.internal:0.0 # tell ROS to send the video image outside of the container
+    depends_on:
+      - ros-core
+    volumes:
+      - ./robot_cell_support:/root/catkin_ws/src/robot_cell_support
+      - ./robot_cell_moveit_config:/root/catkin_ws/src/robot_cell_moveit_config
+    command:
+      # executable part of the configuration file. Whatever is under, is the part that you would type in cmd
+      - roslaunch
+      - --wait
+      - robot_cell_moveit_config
+      - demo.launch # this is what we are actually launching, in the robot_cell_moveit_config ROS package
+      # To launch the RVIZ GUI, change the following to true
+      - use_rviz:=true # start rviz -> small ROS program that has the UI in which you see the robot
+      # rviz is the way to visualize ROS
+      - pipeline:=ompl
+      # use this param to select the robot model:
+      # - robot_cell.xacro is to use with our tools (does not contain suction tool)
+      # - robot_cell_intrinsic.xacro is to use with Intrinsic box (contains suction tool and optionally also tiles)
+      - urdf_file:=robot_cell_intrinsic.xacro
+
+  # moveit-service-setup-assistant:
+  #   image: gramaziokohler/ros-noetic-moveit
+  #   container_name: moveit-service-setup-assistant
+  #   environment:
+  #     - ROS_HOSTNAME=moveit-service-setup-assistant
+  #     - ROS_MASTER_URI=http://ros-core:11311
+  #     # GUI: To forward the GUI to an external X11 server (eg. XMing), uncomment the following line
+  #     - DISPLAY=host.docker.internal:0.0
+  #   depends_on:
+  #     - ros-core
+  #   volumes:
+  #     - ./robot_cell_support:/root/catkin_ws/src/robot_cell_support
+  #     - ./robot_cell_moveit_config:/root/catkin_ws/src/robot_cell_moveit_config
+  #   command:
+  #     - roslaunch
+  #     - --wait
+  #     - moveit_setup_assistant
+  #     - setup_assistant.launch
+
+  ros-core:
+    image: gramaziokohler/ros-noetic-moveit
+    container_name: ros-core
+    ports:
+      - "11311:11311"
+    command:
+      - roscore
+
+  ros-bridge:
+    image: gramaziokohler/ros-noetic-moveit
+    container_name: ros-bridge
+    environment:
+      - "ROS_HOSTNAME=ros-bridge"
+      - "ROS_MASTER_URI=http://ros-core:11311"
+    ports:
+      - "9090:9090"
+    depends_on:
+      - ros-core
+    command:
+      - roslaunch
+      - --wait
+      - rosbridge_server
+      - rosbridge_websocket.launch
+
+  ros-fileserver:
+    image: gramaziokohler/ros-noetic-moveit
+    container_name: ros-fileserver
+    environment:
+      - ROS_HOSTNAME=ros-fileserver
+      - ROS_MASTER_URI=http://ros-core:11311
+    depends_on:
+      - ros-core
+    volumes:
+      - ./robot_cell_support:/root/catkin_ws/src/robot_cell_support
+      - ./robot_cell_moveit_config:/root/catkin_ws/src/robot_cell_moveit_config
+    command:
+      - roslaunch
+      - --wait
+      - file_server
+      - file_server.launch
