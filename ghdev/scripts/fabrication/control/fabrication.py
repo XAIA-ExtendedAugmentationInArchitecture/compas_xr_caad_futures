@@ -337,6 +337,43 @@ def pick_and_place_jk(pick_trajectory_configs, move_trajectory_configs, place_tr
         print(e)
         raise
 
+
+def send_to_trajectory_rfl_setup(exit_trajectory, move_to_pick_trajectory, pick_trajectory, 
+                                 pick_reversed, move_trajectory, place_trajectory, speed, accel, radius, nowait, ip, vaccum_io=None):
+
+    ur_c = RTDEControl(ip)
+    nowait = True
+
+    try:
+        if vaccum_io != None:
+            #TODO: Check IO for on and off
+            #Turn on io to release stick that is being held
+            set_digital_io(vaccum_io,True,ip=ip)
+            #sleep on position to give some time for release
+            time.sleep(1.0)
+
+        #Send pick trajectoy
+        send_trajectory_path(exit_trajectory, speed, accel, radius,ur_c)
+        #Send Move to pick_trajectory
+        send_trajectory_path(move_to_pick_trajectory, speed, accel, radius, ur_c)
+        #Send to pick configs list
+        send_trajectory_path(pick_trajectory, speed, accel, radius, ur_c)
+
+        set_digital_io(vaccum_io, False, ip=ip)
+        time.sleep(1.0)
+
+        #Send to reversed pick configs list
+        send_trajectory_path(pick_reversed, speed, accel, radius, ur_c)
+
+        # Send move trajectory
+        send_trajectory_path(move_trajectory, speed, accel, radius, ur_c)
+        # Send Place Trajectory
+        send_trajectory_path(place_trajectory, speed, accel, radius, ur_c)
+
+    except Exception as e:
+        print(e)
+        raise
+
 def send_to_single_trajectory(trajectory_configs, speed, accel, radius, nowait, ip, vaccum_io=None):
 
     ur_c = RTDEControl(ip)
