@@ -348,9 +348,9 @@ def send_to_trajectory_rfl_setup(exit_trajectory, move_to_pick_trajectory, pick_
         if vaccum_io != None:
             #TODO: Check IO for on and off
             #Turn on io to release stick that is being held
-            set_digital_io(vaccum_io,True,ip=ip)
+            set_digital_io(vaccum_io,False,ip=ip)
             #sleep on position to give some time for release
-            time.sleep(1.0)
+            time.sleep(2.0)
 
         #Send pick trajectoy
         send_trajectory_path(exit_trajectory, speed, accel, radius,ur_c)
@@ -359,8 +359,8 @@ def send_to_trajectory_rfl_setup(exit_trajectory, move_to_pick_trajectory, pick_
         #Send to pick configs list
         send_trajectory_path(pick_trajectory, speed, accel, radius, ur_c)
 
-        set_digital_io(vaccum_io, False, ip=ip)
-        time.sleep(1.0)
+        set_digital_io(vaccum_io, True, ip=ip)
+        time.sleep(2.0)
 
         #Send to reversed pick configs list
         send_trajectory_path(pick_reversed, speed, accel, radius, ur_c)
