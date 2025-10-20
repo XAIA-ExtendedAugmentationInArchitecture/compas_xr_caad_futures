@@ -1,0 +1,19 @@
+{
+    "key": {
+        "part": {
+            "data": {
+                "frame": {
+                    "point": [ 0.77, -0.11, 0.08 ], 
+                    "xaxis": [ -0.04, -0.99, -0.0],
+                    "yaxis": [ 0.99, -0.04, 0.0 ]
+                }, 
+                "xsize": 0.08, 
+                "ysize": 0.02, 
+                "zsize": 0.02
+            }, 
+            "dtype": "compas.geometry/Box", 
+            "guid": "Unique Identifier", 
+            "name": "Box"
+        }
+    }
+}
